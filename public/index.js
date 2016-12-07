@@ -3,11 +3,12 @@ var app = function(){
      makeRequest(url, requestComplete);
      var selectCountry = document.querySelector('select');
      selectCountry.onchange = handleSelectChanged;
-     var lastCountryName = localStorage.getItem('name');
-     var lastCountryCapital = localStorage.getItem('capital');
-     var lastCountryPopulation = localStorage.getItem('population');
-     makePersistentArticle(lastCountryName, lastCountryCapital, lastCountryPopulation);
-     console.log(lastCountryCapital);
+     if (localStorage.getItem('name') != null) {
+          var lastCountryName = localStorage.getItem('name');
+          var lastCountryCapital = localStorage.getItem('capital');
+          var lastCountryPopulation = localStorage.getItem('population');
+          updateCountry(lastCountryName, lastCountryCapital, lastCountryPopulation);
+     }
 }
 
 var makeRequest = function(url, callback){
@@ -20,7 +21,9 @@ var makeRequest = function(url, callback){
      //send the request
      request.send();
 }
+
 var allCountries = [];
+
 var requestComplete = function(){
      // console.log("Whoot! Success!");
      if(this.status !==200) return;
@@ -32,42 +35,20 @@ var requestComplete = function(){
 }
 
 var populateList = function(countries){
-     var select = document.getElementById('country-list');
+     var select = document.querySelector('select');
      var topItem = document.createElement('option');
      topItem.innerText = "Select a country";
      select.appendChild(topItem);
      for (country of countries){
           var option = document.createElement('option');
-          // var dummy = document.createElement('option');
-          // dummy.innerText = "Choose a country";
           option.innerText = country.name;
           option.value = country.alpha3Code;
-          // console.log(country.nativeName);
           select.appendChild(option);
      }
 }
 
-var makePersistentArticle = function(lastCountry, lastCapital, lastPopulation){
-     var countriesDiv = document.getElementById('countries');
-     var article = document.createElement('article');
-     var header = document.createElement('h3');
-     header.innerText = lastCountry;
-     var dataList = document.createElement('ul');
-     var capital = document.createElement('li');
-     capital.innerText = "Capital: " + lastCapital;
-     var population = document.createElement('li');
-     population.innerText = "Population: " + lastPopulation;
-     // console.log(population);
 
-     countriesDiv.appendChild(article);
-     article.appendChild(header);
-     article.appendChild(dataList);
-     dataList.appendChild(capital);
-     dataList.appendChild(population);
-
-}
-
-var getCountryFromCountries = function(countries, value) {
+var getCountryFromList = function(countries, value) {
      for (country of countries){
           if (country.alpha3Code === value){
                return country;
@@ -75,40 +56,24 @@ var getCountryFromCountries = function(countries, value) {
      }
 }
 
-var displayCountry = function(country){
-     console.log(country);
-     // var country = findCountryByCode( countryCode );
-     var countriesDiv = document.getElementById('countries');
-     var article = document.createElement('article');
-     var header = document.createElement('h3');
-     header.innerText = country.name;
-     var dataList = document.createElement('ul');
-     var capital = document.createElement('li');
-     capital.innerText = "Capital: " + country.capital;
-     var population = document.createElement('li');
-     population.innerText = "Population: " + country.population;
-
-     countriesDiv.appendChild(article);
-     article.appendChild(header);
-     article.appendChild(dataList);
-     dataList.appendChild(population);
-     dataList.appendChild(capital);
-}
-
-var removeCountry = function(){
-     var currentCountry = document.getElementById('countries');
-     var article = document.getElementById('article');
-     currentCountry.removeChild(article);
-}
-
 var handleSelectChanged = function(event){
-     console.log(event.target.value);
-     var country = getCountryFromCountries(allCountries,event.target.value);
-     // removeCountry();
-     displayCountry(country);
+     var country = getCountryFromList(allCountries,event.target.value);
+
+     updateCountry (country.name, country.capital, country.population);
+
      localStorage.setItem('name', country.name);
      localStorage.setItem('capital', country.capital);
      localStorage.setItem('population', country.population);
+}
+
+var updateCountry = function(countryName, countryCapital, countryPop){
+     var header = document.querySelector('h3');
+     var tags = document.querySelectorAll('li');
+
+     header.innerText = countryName;
+     tags[0].innerText = "Capital: " + countryCapital;
+     tags[1].innerText = "Population: " + countryPop;
+
 }
 
 window.onload = app;
