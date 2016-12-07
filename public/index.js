@@ -3,6 +3,11 @@ var app = function(){
      makeRequest(url, requestComplete);
      var selectCountry = document.querySelector('select');
      selectCountry.onchange = handleSelectChanged;
+     var lastCountryName = localStorage.getItem('name');
+     var lastCountryCapital = localStorage.getItem('capital');
+     var lastCountryPopulation = localStorage.getItem('population');
+     makePersistentArticle(lastCountryName, lastCountryCapital, lastCountryPopulation);
+     console.log(lastCountryCapital);
 }
 
 var makeRequest = function(url, callback){
@@ -28,6 +33,9 @@ var requestComplete = function(){
 
 var populateList = function(countries){
      var select = document.getElementById('country-list');
+     var topItem = document.createElement('option');
+     topItem.innerText = "Select a country";
+     select.appendChild(topItem);
      for (country of countries){
           var option = document.createElement('option');
           // var dummy = document.createElement('option');
@@ -37,6 +45,26 @@ var populateList = function(countries){
           // console.log(country.nativeName);
           select.appendChild(option);
      }
+}
+
+var makePersistentArticle = function(lastCountry, lastCapital, lastPopulation){
+     var countriesDiv = document.getElementById('countries');
+     var article = document.createElement('article');
+     var header = document.createElement('h3');
+     header.innerText = lastCountry;
+     var dataList = document.createElement('ul');
+     var capital = document.createElement('li');
+     capital.innerText = "Capital: " + lastCapital;
+     var population = document.createElement('li');
+     population.innerText = "Population: " + lastPopulation;
+     // console.log(population);
+
+     countriesDiv.appendChild(article);
+     article.appendChild(header);
+     article.appendChild(dataList);
+     dataList.appendChild(capital);
+     dataList.appendChild(population);
+
 }
 
 var getCountryFromCountries = function(countries, value) {
@@ -55,10 +83,10 @@ var displayCountry = function(country){
      var header = document.createElement('h3');
      header.innerText = country.name;
      var dataList = document.createElement('ul');
-     var population = document.createElement('li');
-     population.innerText = country.population;
      var capital = document.createElement('li');
-     capital.innerText = country.capital;
+     capital.innerText = "Capital: " + country.capital;
+     var population = document.createElement('li');
+     population.innerText = "Population: " + country.population;
 
      countriesDiv.appendChild(article);
      article.appendChild(header);
@@ -67,10 +95,20 @@ var displayCountry = function(country){
      dataList.appendChild(capital);
 }
 
+var removeCountry = function(){
+     var currentCountry = document.getElementById('countries');
+     var article = document.getElementById('article');
+     currentCountry.removeChild(article);
+}
+
 var handleSelectChanged = function(event){
      console.log(event.target.value);
      var country = getCountryFromCountries(allCountries,event.target.value);
+     // removeCountry();
      displayCountry(country);
+     localStorage.setItem('name', country.name);
+     localStorage.setItem('capital', country.capital);
+     localStorage.setItem('population', country.population);
 }
 
 window.onload = app;
